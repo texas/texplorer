@@ -16,19 +16,24 @@ var map = L.map('map', {
 
 map.locate({setView: true, maxZoom: 13});
 
+
+function _gotResults(data) {
+  // draw markers from that data
+
+  // build timeline from that data
+  timeline.init(data);
+}
+
 map.on('locationfound', function(loc) {
   search([loc.latitude, loc.longitude])
-    .then(function (data) {
-      // draw markers from that data
-
-      // build timeline from that data
-      timeline.init(data);
-    });
+    .then(_gotResults);
 });
 
 map.on('moveend', function(result) {
   search([map.getCenter().lat, map.getCenter().lng])
-    .then(function (data) {
-      timeline.init(data);
-    });
+    .then(_gotResults);
 });
+
+// initial load
+search([map.getCenter().lat, map.getCenter().lng])
+  .then(_gotResults);
