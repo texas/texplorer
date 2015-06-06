@@ -11,7 +11,3 @@ es:
 
 index:
 	python main.py
-
-reindex:es
-	sleep 10
-	${MAKE} -s index
