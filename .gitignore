@@ -1,6 +1,10 @@
 # Source data
 *.csv
 
+# build
+node_modules/
+/app.js
+
 # Private user data
 .env
 
