@@ -27,7 +27,7 @@ map.locate({setView: true, maxZoom: 13});
 
 function _gotResults(data) {
   markersLayer.clearLayers();
-  currentMarkers = _.map(data.hits.hits, function(element) {
+  var currentMarkers = _.map(data.hits.hits, function(element) {
     return buildMarker(element._source, markersLayer);
   });
 }
