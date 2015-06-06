@@ -19,7 +19,7 @@ class Classifier(object):
                 output.append(self.process_range(klass, rules))
             elif rules['type'] == 'equal':
                 output.append(self.process_equal(klass, rules))
-        return set([o for o in output if o is not None])
+        return list(set([o for o in output if o is not None]))
 
     def process_equal(self, klass, rules):
         for year in self.years:
