@@ -1,6 +1,5 @@
 var ES_URL = 'localhost:9200';
 
-var $ = require('jquery');
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
   host: ES_URL,
