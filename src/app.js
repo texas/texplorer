@@ -14,17 +14,21 @@ var map = L.map('map', {
    attribution: 'map',
 }).addTo(map);
 
+map.locate({setView: true, maxZoom: 13});
 
-var center = [30.2225, -97.7426];
-// center the map on the point
+map.on('locationfound', function(loc) {
+  search([loc.latitude, loc.longitude])
+    .then(function (data) {
+      // draw markers from that data
 
-// pull data for that point
-search(center)
-  .then(function (data) {
-    // draw markers from that data
+      // build timeline from that data
+      timeline.init(data);
+    });
+});
 
-    // build timeline from that data
-    timeline.init(data);
-  });
-
-
+map.on('moveend', function(result) {
+  search([map.getCenter().lat, map.getCenter().lng])
+    .then(function (data) {
+      timeline.init(data);
+    });
+});
