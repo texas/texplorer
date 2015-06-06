@@ -34,4 +34,4 @@ function search(latLng, distance) {
 }
 
 
-module.exports.search = search;
+module.exports = search;
