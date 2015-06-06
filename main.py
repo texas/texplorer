@@ -5,6 +5,7 @@ import re
 import utm
 from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
+from elasticsearch.client import IndicesClient
 
 
 INDEX = 'thc'
@@ -53,15 +54,39 @@ def get_data(path='data/Historical Marker_20150521_145030_254.csv'):
             yield row
 
 
+def set_mapping():
+    """
+    http://localhost:9200/thc/marker/_mapping?pretty
+    """
+    host = os.environ.get('ELASTICSEARCH_HOST', 'localhost')
+    connection = Elasticsearch([host])
+    iclient = IndicesClient(connection)
+    try:
+        iclient.delete(index=[INDEX])
+    except NotFoundError:
+        pass
+    iclient.create(index=INDEX, body={
+        'mappings': {
+            DOC_TYPE: {
+                'properties': {
+                    'location': {
+                        'type': 'geo_point'
+                    }
+                }
+            }
+        }
+    })
+
+
 def push():
     host = os.environ.get('ELASTICSEARCH_HOST', 'localhost')
     connection = Elasticsearch([host])
 
-    # delete old markers
+    # delete old markers or do initial setup
     try:
         print(connection.delete_by_query(index=[INDEX], doc_type=DOC_TYPE, q='*'))
     except NotFoundError:
-        pass
+        set_mapping()
 
     # TODO use `bulk` to make this faster
     for row in get_data():
@@ -72,4 +97,6 @@ def push():
             id=row['atlas_number'],
         )
 
-push()
+if __name__ == '__main__':
+    push()
+    # set_mapping()
