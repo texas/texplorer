@@ -1,6 +1,8 @@
 class Classifier(object):
     klasses = {
+        'pre_history': {'from': 1000, 'to': 1619, 'type': 'range'},
         'french_colonization': {'from': 1680, 'to': 1690, 'type': 'range'},
+        'spanish_texas': {'from': 1691, 'to': 1821, 'type': 'range'},
         'tx_independence': {'from': 1835, 'to': 1845, 'type': 'range'},
         'civil_war': {'from': 1860, 'to': 1865, 'type': 'range'},
         'galveston_huracane': {'year': 1906, 'type': 'equal'},
@@ -10,7 +12,6 @@ class Classifier(object):
 
     def __init__(self, years, **kwards):
         self.years = years
-        self.text = kwards['text']
 
     def classify(self):
         output = []
