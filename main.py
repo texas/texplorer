@@ -35,18 +35,27 @@ def get_data(path='data/Historical Marker_20150521_145030_254.csv'):
             row['address'] = row['address'].strip()
             # add our own data
             row['years'] = find_years(text)
-            row['location'] = utm.to_latlon(
-                int(row['utm_east']),
-                int(row['utm_north']),
-                int(row['utm_zone']),
-                northern=True,
-            )
+            try:
+                row['location'] = utm.to_latlon(
+                    int(row['utm_east']),
+                    int(row['utm_north']),
+                    int(row['utm_zone']),
+                    northern=True,
+                )
+            except ValueError:
+                # log warn missing
+                pass
             yield row
 
 
 def push():
     host = os.environ.get('ELASTICSEARCH_HOST', 'localhost')
     connection = Elasticsearch([host])
+
+    # delete old markers
+    connection.delete_by_query(index=[INDEX], doc_type=DOC_TYPE, q='*')
+
+    # TODO use `bulk` to make this faster
     for row in get_data():
         connection.create(
             index=INDEX,
