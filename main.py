@@ -4,6 +4,7 @@ import re
 
 import utm
 from elasticsearch import Elasticsearch
+from elasticsearch import NotFoundError
 
 
 INDEX = 'thc'
@@ -36,12 +37,16 @@ def get_data(path='data/Historical Marker_20150521_145030_254.csv'):
             # add our own data
             row['years'] = find_years(text)
             try:
-                row['location'] = utm.to_latlon(
+                lat, lon = utm.to_latlon(
                     int(row['utm_east']),
                     int(row['utm_north']),
                     int(row['utm_zone']),
                     northern=True,
                 )
+                row['location'] = {
+                    "lat": lat,
+                    "lon": lon,
+                }
             except ValueError:
                 # log warn missing
                 pass
@@ -53,7 +58,10 @@ def push():
     connection = Elasticsearch([host])
 
     # delete old markers
-    connection.delete_by_query(index=[INDEX], doc_type=DOC_TYPE, q='*')
+    try:
+        print(connection.delete_by_query(index=[INDEX], doc_type=DOC_TYPE, q='*'))
+    except NotFoundError:
+        pass
 
     # TODO use `bulk` to make this faster
     for row in get_data():
