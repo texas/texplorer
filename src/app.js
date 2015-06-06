@@ -1,6 +1,6 @@
+var _ = require('lodash');
 var timeline = require('./timeline');
 var search = require('./search');
-
 var center = [30.2225, -97.7426];
 var map = L.map('map', {
     center: center,
@@ -13,15 +13,23 @@ var map = L.map('map', {
    maxZoom: 18,
    attribution: 'map',
 }).addTo(map);
+var markersLayer = new L.LayerGroup();
+map.addLayer(markersLayer);
+
+var buildMarker = function(data, group) {
+  return L.marker([data.location.lat, data.location.lon])
+    .bindPopup(data.title)
+    .addTo(markersLayer);
+}
 
 map.locate({setView: true, maxZoom: 13});
 
 
 function _gotResults(data) {
-  // draw markers from that data
-
-  // build timeline from that data
-  timeline.init(data);
+  markersLayer.clearLayers();
+  currentMarkers = _.map(data.hits.hits, function(element) {
+    return buildMarker(element._source, markersLayer);
+  });
 }
 
 map.on('locationfound', function(loc) {
