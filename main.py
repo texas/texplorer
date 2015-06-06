@@ -2,6 +2,7 @@ import csv
 import os
 import re
 
+import utm
 from elasticsearch import Elasticsearch
 
 
@@ -34,6 +35,12 @@ def get_data(path='data/Historical Marker_20150521_145030_254.csv'):
             row['address'] = row['address'].strip()
             # add our own data
             row['years'] = find_years(text)
+            row['location'] = utm.to_latlon(
+                int(row['utm_east']),
+                int(row['utm_north']),
+                int(row['utm_zone']),
+                northern=True,
+            )
             yield row
 
 
