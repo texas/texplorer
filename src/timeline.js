@@ -1,6 +1,64 @@
 var _ = require('lodash');
 var d3 = require('d3');
+window.d3 = d3;  // DEBUG
 
+
+var width, height, svg, svgPlot;
+
+
+function plot(data) {
+  width = $('#timeline').width();
+  height = $('#timeline').height();
+
+  var yearRange = d3.extent(data, (d) => d[0]);
+  var xScale = d3.scale.linear().domain(yearRange).range([0, width]);
+
+  var timeline = d3.select('#timeline');
+  if (!svgPlot) {
+    svg = d3.select('#timeline')
+      .append('svg')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('viewbox', '0 0 ${width} 100')
+      .attr('preserveAspectRatio', 'xMinYMin meet');
+
+    svgPlot = svg.append('g').attr('class', 'plot')
+  }
+
+  svgPlot.selectAll('rect')
+    .data(data)
+    .enter()
+      .append('rect')
+      .style()
+      .attr('width', 10)
+      .attr('height', (d) => d[1].length * 10)
+      .attr('transform',
+        (d) => `translate(${xScale(d[0])}, 20)`)
+
+  var xAxis = d3.svg.axis().orient('bottom')
+    .scale(xScale)
+    .tickFormat((x) => x)
+  svg.append('g')
+    .attr('class', 'x axis')
+    .attr('transform', `translate(0, ${height - 20})`)
+    .call(xAxis);
+
+  // timeline.selectAll('div')
+  //   .data(timelineData)
+  //   .enter()
+  //     .append('div.year')
+  //     .attr('class', 'year')
+  //     .style('left', (d) => xScale(d[0]) + '%')
+  //     .style('left', (d) => xScale(d[0]) + '%')
+  //     .text((d) => d[0])
+  //     .selectAll('div.marker')
+  //     .data((d) => d[1])
+  //       .enter()
+  //       .append('div')
+  //       .attr('class', 'marker')
+  //       .text((d) => d.indexname);
+
+}
 
 function init(data) {
   var yearBuckets = {};
@@ -15,29 +73,7 @@ function init(data) {
   });
 
   var timelineData = _.pairs(yearBuckets);
-  window.timelineData = timelineData;
-  window.d3 = d3;
-  var yearRange = d3.extent(timelineData, (d) => d[0]);
-  var xScale = d3.scale.linear().domain(yearRange).range([0, 100]);
-  window.zz = xScale
-
-
-  var timeline = d3.select('#timeline');
-  timeline.selectAll('div')
-    .data(timelineData)
-    .enter()
-      .append('div.year')
-      .attr('class', 'year')
-      .style('left', (d) => xScale(d[0]) + '%')
-      .style('left', (d) => xScale(d[0]) + '%')
-      .text((d) => d[0])
-      .selectAll('div.marker')
-      .data((d) => d[1])
-        .enter()
-        .append('div')
-        .attr('class', 'marker')
-        .text((d) => d.indexname);
-
+  plot(timelineData);
 }
 
 module.exports.init = init;

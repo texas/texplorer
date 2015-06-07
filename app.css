@@ -7,3 +7,14 @@
 .year {
   position: absolute;
 }
+
+.axis {
+  font-size: 0.75em;
+}
+
+.axis path, .axis line {
+  fill: none;
+  shape-rendering: crispEdges;
+  stroke-width: 1;
+  stroke: black;
+}
