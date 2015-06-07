@@ -1,6 +1,9 @@
 var _ = require('lodash');
 var timeline = require('./timeline');
 var search = require('./search');
+var colorsScale = require('./colors');
+var d3 = require('d3');
+
 var center = [30.2225, -97.7426];
 var map = L.map('map', {
     center: center,
@@ -17,13 +20,15 @@ var markersLayer = new L.LayerGroup();
 map.addLayer(markersLayer);
 
 var markerLookup = {};
-window.markerLookup = markerLookup;  // DEBUG
 var buildMarker = function(data, group) {
   var html = `<h2>${data.title}</h2><p>${data.markertext}</p>`;
 
-  var icon = L.AwesomeMarkers.icon({icon: 'question-mark'});
-  var marker =  L.marker([data.location.lat, data.location.lon], {
-    icon: icon
+  window.zz = colors
+  var marker =  L.circleMarker([data.location.lat, data.location.lon], {
+    color: d3.rgb(colors(data.markernum)).darker(1),
+    fillColor: colors(data.markernum),
+    fillOpacity: 0.8,
+    radius: 7
   })
     .bindPopup(html, {autoPan: false})
     .addTo(markersLayer);
@@ -32,9 +37,11 @@ var buildMarker = function(data, group) {
 
 map.locate({setView: true, maxZoom: 13});
 
+var colors;
 
 function _gotResults(data) {
   markersLayer.clearLayers();
+  colors = colorsScale(data);
   var currentMarkers = _.map(data.hits.hits, function(element) {
     return buildMarker(element._source, markersLayer);
   });
