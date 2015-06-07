@@ -13,7 +13,12 @@ function plot(data) {
   var yearRange = d3.extent(data, (d) => d[0]);
   var xScale = d3.scale.linear().domain(yearRange).range([0, width]);
 
+  var xAxis = d3.svg.axis().orient('bottom')
+    .scale(xScale)
+    .tickFormat((x) => x)
+
   var timeline = d3.select('#timeline');
+
   if (!svgPlot) {
     svg = d3.select('#timeline')
       .append('svg')
@@ -23,25 +28,26 @@ function plot(data) {
       .attr('preserveAspectRatio', 'xMinYMin meet');
 
     svgPlot = svg.append('g').attr('class', 'plot')
+    svg.append('g')
+      .attr('class', 'x axis')
+      .attr('transform', `translate(0, ${height - 20})`)
+      .call(xAxis);
+  } else {
+    svg.select('.x.axis')
+      .transition().duration(1000).call(xAxis)
   }
 
-  svgPlot.selectAll('rect')
-    .data(data)
+  var plotItems = svgPlot.selectAll('rect').data(data);
+  plotItems
     .enter()
       .append('rect')
       .style()
       .attr('width', 10)
       .attr('height', (d) => d[1].length * 10)
       .attr('transform',
-        (d) => `translate(${xScale(d[0])}, 20)`)
-
-  var xAxis = d3.svg.axis().orient('bottom')
-    .scale(xScale)
-    .tickFormat((x) => x)
-  svg.append('g')
-    .attr('class', 'x axis')
-    .attr('transform', `translate(0, ${height - 20})`)
-    .call(xAxis);
+        (d) => `translate(${xScale(d[0])}, 20)`);
+  plotItems
+    .exit().remove();
 
   // timeline.selectAll('div')
   //   .data(timelineData)
