@@ -1,0 +1,9 @@
+.timeline {
+  position: relative;
+  height: 200px;
+  width: 100%;
+}
+
+.year {
+  position: absolute;
+}

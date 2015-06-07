@@ -14,7 +14,7 @@ module.exports = (grunt) ->
         options:
           spawn: false
       livereload:
-        files: ['index.html', 'app.js']
+        files: ['index.html', 'app.css', 'app.js']
         options:
           livereload: true
     connect:
