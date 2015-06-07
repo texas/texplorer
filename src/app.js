@@ -41,6 +41,11 @@ function _gotResults(data) {
   var bounds = map.getBounds();
   var visibleMarkers = _.filter(data.hits.hits,
         (x) => bounds.contains([x._source.location.lat, x._source.location.lon]))
+  if (!visibleMarkers.length) {
+    // bail
+    // TODO handle when there's nothing to show
+    return;
+  }
   colorScale = colors(visibleMarkers);
   _.map(visibleMarkers, (element) => buildMarker(element._source, markersLayer));
   timeline.init(visibleMarkers);
