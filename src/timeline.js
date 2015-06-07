@@ -1,12 +1,13 @@
 var _ = require('lodash');
 var d3 = require('d3');
+var colors = require('./colors');
 window.d3 = d3;  // DEBUG
 
 
 var width, height, svg, svgPlot;
+var colorScale;
 
-
-function plot(data, names) {
+function plot(data) {
   width = $('#timeline').width();
   height = $('#timeline').height();
   var markerHeight = 20;
@@ -14,7 +15,6 @@ function plot(data, names) {
 
   var yearRange = d3.extent(data, (d) => d[0]);
   var xScale = d3.scale.linear().domain(yearRange).range([0, width]);
-  var colorScale = d3.scale.category20().domain(names)
 
   var xAxis = d3.svg.axis().orient('bottom')
     .scale(xScale)
@@ -65,10 +65,9 @@ function plot(data, names) {
 
 function init(data) {
   var yearBuckets = {};
-  var markers = [];
+  colorScale = colors(data);
   _.each(data.hits.hits, function (marker) {
     // console.log(marker._source.indexname, marker._source.years, marker._source);
-    markers.push(marker._source.markernum)
     _.each(marker._source.years, function (year) {
       if (!yearBuckets[year]) {
         yearBuckets[year] = [];
@@ -78,7 +77,7 @@ function init(data) {
   });
 
   var timelineData = _.pairs(yearBuckets);
-  plot(timelineData, markers);
+  plot(timelineData);
 }
 
 module.exports.init = init;
