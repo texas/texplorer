@@ -48,3 +48,7 @@ map.on('moveend', function(result) {
 // initial load
 search([map.getCenter().lat, map.getCenter().lng])
   .then(_gotResults);
+
+$('#timeline').on('ufoClick', function (e, a) {
+  console.log(e, a)
+});

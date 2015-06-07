@@ -52,9 +52,11 @@ function plot(data, names) {
           .append('rect')
           .attr('class', 'market')
           .attr('fill', (d) => colorScale(d.markernum))
+          .attr('cursor', 'pointer')
           .attr('width', markerWidth)
           .attr('height', markerHeight)
           .attr('transform', (d, i) => `translate(0, ${markerHeight * i})`)
+          .on('click', (d) => $('#timeline').trigger('ufoClick', d))
 
   plotItems
     .exit().remove();

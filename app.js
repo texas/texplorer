@@ -64878,10 +64878,15 @@ map.on('moveend', function (result) {
 // initial load
 search([map.getCenter().lat, map.getCenter().lng]).then(_gotResults);
 
+$('#timeline').on('ufoClick', function (e, a) {
+  console.log(e, a);
+});
+
 },{"./search":50,"./timeline":51,"lodash":48}],50:[function(require,module,exports){
 'use strict';
 
-var ES_URL = 'http://45.55.233.185:9200';
+var ES_URL = 'localhost:9200';
+var ES_URL = '45.55.233.185:9200';
 
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
@@ -64925,14 +64930,17 @@ window.d3 = d3; // DEBUG
 
 var width, height, svg, svgPlot;
 
-function plot(data) {
+function plot(data, names) {
   width = $('#timeline').width();
   height = $('#timeline').height();
+  var markerHeight = 20;
+  var markerWidth = 7;
 
   var yearRange = d3.extent(data, function (d) {
     return d[0];
   });
   var xScale = d3.scale.linear().domain(yearRange).range([0, width]);
+  var colorScale = d3.scale.category20().domain(names);
 
   var xAxis = d3.svg.axis().orient('bottom').scale(xScale).tickFormat(function (x) {
     return x;
@@ -64954,38 +64962,33 @@ function plot(data) {
     return 'translate(' + xScale(d[0]) + ', 0)';
   }).selectAll('rect.marker').data(function (d) {
     return d[1];
-  }).enter().append('rect').attr('class', 'market').attr('width', 10).attr('height', 10).attr('transform', function (d, i) {
-    return 'translate(0, ' + 10 * i + ')';
+  }).enter().append('rect').attr('class', 'market').attr('fill', function (d) {
+    return colorScale(d.markernum);
+  }).attr('cursor', 'pointer').attr('width', markerWidth).attr('height', markerHeight).attr('transform', function (d, i) {
+    return 'translate(0, ' + markerHeight * i + ')';
+  }).on('click', function (d) {
+    return $('#timeline').trigger('ufoClick', d);
   });
 
   plotItems.exit().remove();
-
-  // timeline.selectAll('div')
-  //   .data(timelineData)
-  //   .enter()
-  //     .append('div.year')
-  //     .selectAll('div.marker')
-  //     .data((d) => d[1])
-  //       .enter()
-  //       .append('div')
-  //       .attr('class', 'marker')
-  //       .text((d) => d.indexname);
 }
 
 function init(data) {
   var yearBuckets = {};
-  _.each(data.hits.hits, function (hit) {
-    console.log(hit._source.indexname, hit._source.years);
-    _.each(hit._source.years, function (year) {
+  var markers = [];
+  _.each(data.hits.hits, function (marker) {
+    console.log(marker._source.indexname, marker._source.years, marker._source);
+    markers.push(marker._source.markernum);
+    _.each(marker._source.years, function (year) {
       if (!yearBuckets[year]) {
         yearBuckets[year] = [];
       }
-      yearBuckets[year].push(hit._source);
+      yearBuckets[year].push(marker._source);
     });
   });
 
   var timelineData = _.pairs(yearBuckets);
-  plot(timelineData);
+  plot(timelineData, markers);
 }
 
 module.exports.init = init;
