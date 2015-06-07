@@ -37,15 +37,21 @@ function plot(data) {
       .transition().duration(1000).call(xAxis)
   }
 
-  var plotItems = svgPlot.selectAll('rect').data(data);
+  var plotItems = svgPlot.selectAll('g.year').data(data);
   plotItems
     .enter()
-      .append('rect')
-      .style()
-      .attr('width', 10)
-      .attr('height', (d) => d[1].length * 10)
-      .attr('transform',
-        (d) => `translate(${xScale(d[0])}, 20)`);
+      .append('g')
+      .attr('class', 'year')
+      .attr('transform', (d) => `translate(${xScale(d[0])}, 0)`)
+      .selectAll('rect.marker')
+        .data((d) => d[1])
+        .enter()
+          .append('rect')
+          .attr('class', 'market')
+          .attr('width', 10)
+          .attr('height', 10)
+          .attr('transform', (d, i) => `translate(0, ${10 * i})`)
+
   plotItems
     .exit().remove();
 
@@ -53,10 +59,6 @@ function plot(data) {
   //   .data(timelineData)
   //   .enter()
   //     .append('div.year')
-  //     .attr('class', 'year')
-  //     .style('left', (d) => xScale(d[0]) + '%')
-  //     .style('left', (d) => xScale(d[0]) + '%')
-  //     .text((d) => d[0])
   //     .selectAll('div.marker')
   //     .data((d) => d[1])
   //       .enter()
