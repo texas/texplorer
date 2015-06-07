@@ -79,19 +79,23 @@ function plot(data) {
       .append('g')
       .attr('class', 'year')
       .attr('transform', (d) => `translate(${xScale(d[0])}, 0)`)
-      .attr('year', (d) => d[0])
+      .attr('year', (d) => d[0])  // DEBUG
 
-  plotMarkers.enter().append('rect')
-    .attr('class', 'market')
+  var incomingMarkers = plotMarkers.enter().append('rect')
+    .attr('class', 'marker')
     .attr('stroke', (d) => d3.rgb(colorScale(d.markernum)).darker(1))
     .attr('fill', (d) => colorScale(d.markernum))
     .attr('cursor', 'pointer')
-    .attr('width', markerWidth)
+    .attr('width', 0)
     .attr('height', markerHeight)
     .attr('transform', (d, i) => `translate(0, ${markerHeight * i})`)
     .on('click', (d) => $('#timeline').trigger('ufoClick', d))
+  incomingMarkers
     .append('title')
       .text((d) => d.indexname)
+  incomingMarkers
+    .transition().duration(1000)
+      .attr('width', markerWidth)
 
   plotYears
     .transition().duration(1000)
@@ -100,13 +104,13 @@ function plot(data) {
   plotMarkers
     .exit()
     .transition().duration(1000)
-      // .attr('width', (d) => console.log('..', d))
       .attr('transform', (d, i) => `translate(0, ${height})`)
       .remove();
 
   plotYears
     .exit()
       .transition().duration(1000)
+      .attr('opacity', 0)
       .remove()
 }
 

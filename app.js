@@ -65014,31 +65014,31 @@ function plot(data) {
     return 'translate(' + xScale(d[0]) + ', 0)';
   }).attr('year', function (d) {
     return d[0];
-  });
+  }); // DEBUG
 
-  plotMarkers.enter().append('rect').attr('class', 'market').attr('stroke', function (d) {
+  var incomingMarkers = plotMarkers.enter().append('rect').attr('class', 'marker').attr('stroke', function (d) {
     return d3.rgb(colorScale(d.markernum)).darker(1);
   }).attr('fill', function (d) {
     return colorScale(d.markernum);
-  }).attr('cursor', 'pointer').attr('width', markerWidth).attr('height', markerHeight).attr('transform', function (d, i) {
+  }).attr('cursor', 'pointer').attr('width', 0).attr('height', markerHeight).attr('transform', function (d, i) {
     return 'translate(0, ' + markerHeight * i + ')';
   }).on('click', function (d) {
     return $('#timeline').trigger('ufoClick', d);
-  }).append('title').text(function (d) {
+  });
+  incomingMarkers.append('title').text(function (d) {
     return d.indexname;
   });
+  incomingMarkers.transition().duration(1000).attr('width', markerWidth);
 
   plotYears.transition().duration(1000).attr('transform', function (d) {
     return 'translate(' + xScale(d[0]) + ', 0)';
   });
 
-  plotMarkers.exit().transition().duration(1000)
-  // .attr('width', (d) => console.log('..', d))
-  .attr('transform', function (d, i) {
+  plotMarkers.exit().transition().duration(1000).attr('transform', function (d, i) {
     return 'translate(0, ' + height + ')';
   }).remove();
 
-  plotYears.exit().transition().duration(1000).remove();
+  plotYears.exit().transition().duration(1000).attr('opacity', 0).remove();
 }
 
 function init(data) {
