@@ -64851,10 +64851,13 @@ L.tileLayer('http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.jpg', {
 var markersLayer = new L.LayerGroup();
 map.addLayer(markersLayer);
 
+var markerLookup = {};
+window.markerLookup = markerLookup; // DEBUG
 var buildMarker = function buildMarker(data, group) {
   var html = '<h2>' + data.title + '</h2><p>' + data.markertext + '</p>';
 
-  return L.marker([data.location.lat, data.location.lon]).bindPopup(html, { autoPan: false }).addTo(markersLayer);
+  var marker = L.marker([data.location.lat, data.location.lon]).bindPopup(html, { autoPan: false }).addTo(markersLayer);
+  markerLookup[data.markernum] = marker;
 };
 
 map.locate({ setView: true, maxZoom: 13 });
@@ -64879,7 +64882,8 @@ map.on('moveend', function (result) {
 search([map.getCenter().lat, map.getCenter().lng]).then(_gotResults);
 
 $('#timeline').on('ufoClick', function (e, a) {
-  console.log(e, a);
+  var marker = markerLookup[a.markernum];
+  marker && marker.openPopup();
 });
 
 },{"./search":50,"./timeline":51,"lodash":48}],50:[function(require,module,exports){
@@ -64977,7 +64981,7 @@ function init(data) {
   var yearBuckets = {};
   var markers = [];
   _.each(data.hits.hits, function (marker) {
-    console.log(marker._source.indexname, marker._source.years, marker._source);
+    // console.log(marker._source.indexname, marker._source.years, marker._source);
     markers.push(marker._source.markernum);
     _.each(marker._source.years, function (year) {
       if (!yearBuckets[year]) {

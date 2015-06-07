@@ -67,7 +67,7 @@ function init(data) {
   var yearBuckets = {};
   var markers = [];
   _.each(data.hits.hits, function (marker) {
-    console.log(marker._source.indexname, marker._source.years, marker._source);
+    // console.log(marker._source.indexname, marker._source.years, marker._source);
     markers.push(marker._source.markernum)
     _.each(marker._source.years, function (year) {
       if (!yearBuckets[year]) {

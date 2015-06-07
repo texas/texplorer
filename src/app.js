@@ -16,12 +16,15 @@ var map = L.map('map', {
 var markersLayer = new L.LayerGroup();
 map.addLayer(markersLayer);
 
+var markerLookup = {};
+window.markerLookup = markerLookup;  // DEBUG
 var buildMarker = function(data, group) {
   var html = `<h2>${data.title}</h2><p>${data.markertext}</p>`;
 
-  return L.marker([data.location.lat, data.location.lon])
+  var marker =  L.marker([data.location.lat, data.location.lon])
     .bindPopup(html, {autoPan: false})
     .addTo(markersLayer);
+  markerLookup[data.markernum] = marker;
 }
 
 map.locate({setView: true, maxZoom: 13});
@@ -50,5 +53,6 @@ search([map.getCenter().lat, map.getCenter().lng])
   .then(_gotResults);
 
 $('#timeline').on('ufoClick', function (e, a) {
-  console.log(e, a)
+  var marker = markerLookup[a.markernum];
+  marker && marker.openPopup();
 });
