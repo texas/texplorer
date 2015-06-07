@@ -4,6 +4,7 @@ var search = require('./search');
 var colorsScale = require('./colors');
 var d3 = require('d3');
 
+var colors;
 var center = [30.2225, -97.7426];
 var map = L.map('map', {
     center: center,
@@ -18,12 +19,12 @@ var map = L.map('map', {
 }).addTo(map);
 var markersLayer = new L.LayerGroup();
 map.addLayer(markersLayer);
+map.locate({setView: true, maxZoom: 13});
 
 var markerLookup = {};
 var buildMarker = function(data, group) {
   var html = `<h2>${data.title}</h2><p>${data.markertext}</p>`;
 
-  window.zz = colors
   var marker =  L.circleMarker([data.location.lat, data.location.lon], {
     color: d3.rgb(colors(data.markernum)).darker(1),
     fillColor: colors(data.markernum),
@@ -35,14 +36,10 @@ var buildMarker = function(data, group) {
   markerLookup[data.markernum] = marker;
 }
 
-map.locate({setView: true, maxZoom: 13});
-
-var colors;
-
 function _gotResults(data) {
   markersLayer.clearLayers();
   colors = colorsScale(data);
-  var currentMarkers = _.map(data.hits.hits, function(element) {
+  _.map(data.hits.hits, function(element) {
     return buildMarker(element._source, markersLayer);
   });
   timeline.init(data);

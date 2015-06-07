@@ -60,7 +60,6 @@ function plot(data) {
 
   plotItems
     .exit().remove();
-
 }
 
 function init(data) {
