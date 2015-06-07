@@ -17,3 +17,8 @@ index`.
 Start a webserver on port 8000:
 
 `grunt dev`
+
+#### Data sources
+
+* [Texas Historical Commission](http://atlas.thc.state.tx.us/shell-mrd.htm)
+* [Dataset](https://s3-us-west-2.amazonaws.com/data.codingnews.info/Historical+Marker_20150521_145030_254.csv)
