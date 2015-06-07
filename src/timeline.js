@@ -6,12 +6,15 @@ window.d3 = d3;  // DEBUG
 var width, height, svg, svgPlot;
 
 
-function plot(data) {
+function plot(data, names) {
   width = $('#timeline').width();
   height = $('#timeline').height();
+  var markerHeight = 20;
+  var markerWidth= 7;
 
   var yearRange = d3.extent(data, (d) => d[0]);
   var xScale = d3.scale.linear().domain(yearRange).range([0, width]);
+  var colorScale = d3.scale.category20().domain(names)
 
   var xAxis = d3.svg.axis().orient('bottom')
     .scale(xScale)
@@ -48,40 +51,32 @@ function plot(data) {
         .enter()
           .append('rect')
           .attr('class', 'market')
-          .attr('width', 10)
-          .attr('height', 10)
-          .attr('transform', (d, i) => `translate(0, ${10 * i})`)
+          .attr('fill', (d) => colorScale(d.markernum))
+          .attr('width', markerWidth)
+          .attr('height', markerHeight)
+          .attr('transform', (d, i) => `translate(0, ${markerHeight * i})`)
 
   plotItems
     .exit().remove();
-
-  // timeline.selectAll('div')
-  //   .data(timelineData)
-  //   .enter()
-  //     .append('div.year')
-  //     .selectAll('div.marker')
-  //     .data((d) => d[1])
-  //       .enter()
-  //       .append('div')
-  //       .attr('class', 'marker')
-  //       .text((d) => d.indexname);
 
 }
 
 function init(data) {
   var yearBuckets = {};
-  _.each(data.hits.hits, function (hit) {
-    console.log(hit._source.indexname, hit._source.years);
-    _.each(hit._source.years, function (year) {
+  var markers = [];
+  _.each(data.hits.hits, function (marker) {
+    console.log(marker._source.indexname, marker._source.years, marker._source);
+    markers.push(marker._source.markernum)
+    _.each(marker._source.years, function (year) {
       if (!yearBuckets[year]) {
         yearBuckets[year] = [];
       }
-      yearBuckets[year].push(hit._source);
+      yearBuckets[year].push(marker._source);
     });
   });
 
   var timelineData = _.pairs(yearBuckets);
-  plot(timelineData);
+  plot(timelineData, markers);
 }
 
 module.exports.init = init;
