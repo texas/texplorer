@@ -64856,7 +64856,10 @@ window.markerLookup = markerLookup; // DEBUG
 var buildMarker = function buildMarker(data, group) {
   var html = '<h2>' + data.title + '</h2><p>' + data.markertext + '</p>';
 
-  var marker = L.marker([data.location.lat, data.location.lon]).bindPopup(html, { autoPan: false }).addTo(markersLayer);
+  var icon = L.AwesomeMarkers.icon({ icon: 'question-mark' });
+  var marker = L.marker([data.location.lat, data.location.lon], {
+    icon: icon
+  }).bindPopup(html, { autoPan: false }).addTo(markersLayer);
   markerLookup[data.markernum] = marker;
 };
 
