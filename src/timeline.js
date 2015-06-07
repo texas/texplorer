@@ -117,7 +117,7 @@ function plot(data) {
 function init(data) {
   var yearBuckets = {};
   colorScale = colors(data);
-  _.each(data.hits.hits, (marker) => {
+  _.each(data, (marker) => {
     // console.log(marker._source.indexname, marker._source.years, marker._source);
     _.each(marker._source.years, (year) => {
       if (!yearBuckets[year]) {

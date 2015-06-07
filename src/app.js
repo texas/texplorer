@@ -1,10 +1,10 @@
 var _ = require('lodash');
 var timeline = require('./timeline');
 var search = require('./search');
-var colorsScale = require('./colors');
+var colors = require('./colors');
 var d3 = require('d3');
 
-var colors;
+var colorScale;
 var center = [30.2225, -97.7426];
 var map = L.map('map', {
     center: center,
@@ -26,8 +26,8 @@ var buildMarker = function(data, group) {
   var html = `<h2>${data.title}</h2><p>${data.markertext}</p>`;
 
   var marker =  L.circleMarker([data.location.lat, data.location.lon], {
-    color: d3.rgb(colors(data.markernum)).darker(1),
-    fillColor: colors(data.markernum),
+    color: d3.rgb(colorScale(data.markernum)).darker(1),
+    fillColor: colorScale(data.markernum),
     fillOpacity: 0.8,
     radius: 7
   })
@@ -38,11 +38,12 @@ var buildMarker = function(data, group) {
 
 function _gotResults(data) {
   markersLayer.clearLayers();
-  colors = colorsScale(data);
-  _.map(data.hits.hits, function(element) {
-    return buildMarker(element._source, markersLayer);
-  });
-  timeline.init(data);
+  var bounds = map.getBounds();
+  var visibleMarkers = _.filter(data.hits.hits,
+        (x) => bounds.contains([x._source.location.lat, x._source.location.lon]))
+  colorScale = colors(visibleMarkers);
+  _.map(visibleMarkers, (element) => buildMarker(element._source, markersLayer));
+  timeline.init(visibleMarkers);
 }
 
 map.on('locationfound', function(loc) {

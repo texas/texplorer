@@ -64836,10 +64836,10 @@ function hasOwnProperty(obj, prop) {
 var _ = require('lodash');
 var timeline = require('./timeline');
 var search = require('./search');
-var colorsScale = require('./colors');
+var colors = require('./colors');
 var d3 = require('d3');
 
-var colors;
+var colorScale;
 var center = [30.2225, -97.7426];
 var map = L.map('map', {
   center: center,
@@ -64861,8 +64861,8 @@ var buildMarker = function buildMarker(data, group) {
   var html = '<h2>' + data.title + '</h2><p>' + data.markertext + '</p>';
 
   var marker = L.circleMarker([data.location.lat, data.location.lon], {
-    color: d3.rgb(colors(data.markernum)).darker(1),
-    fillColor: colors(data.markernum),
+    color: d3.rgb(colorScale(data.markernum)).darker(1),
+    fillColor: colorScale(data.markernum),
     fillOpacity: 0.8,
     radius: 7
   }).bindPopup(html, { autoPan: false }).addTo(markersLayer);
@@ -64871,11 +64871,15 @@ var buildMarker = function buildMarker(data, group) {
 
 function _gotResults(data) {
   markersLayer.clearLayers();
-  colors = colorsScale(data);
-  _.map(data.hits.hits, function (element) {
+  var bounds = map.getBounds();
+  var visibleMarkers = _.filter(data.hits.hits, function (x) {
+    return bounds.contains([x._source.location.lat, x._source.location.lon]);
+  });
+  colorScale = colors(visibleMarkers);
+  _.map(visibleMarkers, function (element) {
     return buildMarker(element._source, markersLayer);
   });
-  timeline.init(data);
+  timeline.init(visibleMarkers);
 }
 
 map.on('locationfound', function (loc) {
@@ -64901,7 +64905,7 @@ var _ = require('lodash');
 var d3 = require('d3');
 
 module.exports = function (data) {
-  var markers = _.map(data.hits.hits, function (x) {
+  var markers = _.map(data, function (x) {
     return x._source.markernum;
   });
   console.log(markers);
@@ -65044,7 +65048,7 @@ function plot(data) {
 function init(data) {
   var yearBuckets = {};
   colorScale = colors(data);
-  _.each(data.hits.hits, function (marker) {
+  _.each(data, function (marker) {
     // console.log(marker._source.indexname, marker._source.years, marker._source);
     _.each(marker._source.years, function (year) {
       if (!yearBuckets[year]) {
