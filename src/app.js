@@ -6,9 +6,14 @@ var d3 = require('d3');
 
 var colorScale;
 var center = [30.2225, -97.7426];
+var southWest = L.latLng(26.603, -106.567);
+var northEast = L.latLng(36.927, -93.515);
+var bounds = L.latLngBounds(southWest, northEast);
 var map = L.map('map', {
     center: center,
     zoom: 12,
+    minZoom: 6,
+    maxBounds: bounds,
     zoomControl: false
   });
   window.map = map;  // DEBUG
