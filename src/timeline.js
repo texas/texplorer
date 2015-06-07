@@ -51,7 +51,7 @@ function plot(data) {
       .attr('width', (d) => xScale(d.end - d.start + yearZero))
       .attr('height', height - 20)
       .attr('fill', (d) => d.fill)
-      .attr('opacity', 0.75)
+      .attr('opacity', 0.5)
       .attr('transform', (d) => `translate(${xScale(d.start)}, 0)`)
       .append('title')
         .text((d) => d.name)

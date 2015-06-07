@@ -1,10 +1,14 @@
 #map {
+  border: 1px solid gray;
+  border-bottom: 0;
   height: 70vh;
 }
 
 .timeline {
-  position: relative;
+  border: 1px solid gray;
+  border-top: 0;
   height: 100px;
+  position: relative;
   width: 100%;
 }
 

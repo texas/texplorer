@@ -64987,7 +64987,7 @@ function plot(data) {
       return xScale(d.end - d.start + yearZero);
     }).attr('height', height - 20).attr('fill', function (d) {
       return d.fill;
-    }).attr('opacity', 0.75).attr('transform', function (d) {
+    }).attr('opacity', 0.5).attr('transform', function (d) {
       return 'translate(' + xScale(d.start) + ', 0)';
     }).append('title').text(function (d) {
       return d.name;
