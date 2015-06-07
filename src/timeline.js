@@ -70,49 +70,44 @@ function plot(data) {
       .transition().duration(1000)
       .attr('width', (d) => xScale(d.end - d.start + yearZero))
       .attr('transform', (d) => `translate(${xScale(d.start)}, 0)`);
-    // HACK because I can't get .exit().remove() to work right
-    svgPlot.selectAll('g.year').remove();
   }
 
-  var plotItems = svgPlot.selectAll('g.year').data(data);
-  plotItems
+  var plotYears = svgPlot.selectAll('g.year').data(data);
+  var plotMarkers = plotYears.selectAll('rect.marker').data((d) => d[1])
+  plotYears
     .enter()
       .append('g')
       .attr('class', 'year')
-      .attr('transform', (d) => `translate(${xScale(d[0]) - markerWidth}, 0)`)
+      .attr('transform', (d) => `translate(${xScale(d[0])}, 0)`)
       .attr('year', (d) => d[0])
-      .selectAll('rect.marker')
-        .data((d) => d[1])
-        .enter()
-          .append('rect')
-          .attr('class', 'market')
-          .attr('fill', (d) => colorScale(d.markernum))
-          .attr('cursor', 'pointer')
-          .attr('width', markerWidth)
-          .attr('height', markerHeight)
-          .attr('transform', (d, i) => `translate(0, ${markerHeight * i})`)
-          .on('click', (d) => $('#timeline').trigger('ufoClick', d))
-          .append('title')
-            .text((d) => `${d.indexname}`)
-  plotItems
+
+  plotMarkers.enter().append('rect')
+    .attr('class', 'market')
+    .attr('stroke', (d) => d3.rgb(colorScale(d.markernum)).darker(1))
+    .attr('fill', (d) => colorScale(d.markernum))
+    .attr('cursor', 'pointer')
+    .attr('width', markerWidth)
+    .attr('height', markerHeight)
+    .attr('transform', (d, i) => `translate(0, ${markerHeight * i})`)
+    .on('click', (d) => $('#timeline').trigger('ufoClick', d))
+    .append('title')
+      .text((d) => d.indexname)
+
+  plotYears
     .transition().duration(1000)
     .attr('transform', (d) => `translate(${xScale(d[0])}, 0)`)
 
-  plotItems
+  plotMarkers
     .exit()
-      .selectAll('rect.marker')
-        .attr('width', (d) => console.log('..', d))
-        .attr('transform', (d, i) => `translate(0, ${height})`)
-        .remove();
-  plotItems
+    .transition().duration(1000)
+      // .attr('width', (d) => console.log('..', d))
+      .attr('transform', (d, i) => `translate(0, ${height})`)
+      .remove();
+
+  plotYears
     .exit()
-      .attr('width', (d) => console.log('bye', d))
+      .transition().duration(1000)
       .remove()
-      .selectAll('rect.marker')
-        .transition().duration(1000)
-        .attr('width', 0)
-        .attr('transform', (d, i) => `translate(0, ${height})`)
-        .remove();
 }
 
 function init(data) {

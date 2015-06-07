@@ -65004,40 +65004,41 @@ function plot(data) {
     }).attr('transform', function (d) {
       return 'translate(' + xScale(d.start) + ', 0)';
     });
-    // HACK because I can't get .exit().remove() to work right
-    svgPlot.selectAll('g.year').remove();
   }
 
-  var plotItems = svgPlot.selectAll('g.year').data(data);
-  plotItems.enter().append('g').attr('class', 'year').attr('transform', function (d) {
-    return 'translate(' + (xScale(d[0]) - markerWidth) + ', 0)';
+  var plotYears = svgPlot.selectAll('g.year').data(data);
+  var plotMarkers = plotYears.selectAll('rect.marker').data(function (d) {
+    return d[1];
+  });
+  plotYears.enter().append('g').attr('class', 'year').attr('transform', function (d) {
+    return 'translate(' + xScale(d[0]) + ', 0)';
   }).attr('year', function (d) {
     return d[0];
-  }).selectAll('rect.marker').data(function (d) {
-    return d[1];
-  }).enter().append('rect').attr('class', 'market').attr('fill', function (d) {
+  });
+
+  plotMarkers.enter().append('rect').attr('class', 'market').attr('stroke', function (d) {
+    return d3.rgb(colorScale(d.markernum)).darker(1);
+  }).attr('fill', function (d) {
     return colorScale(d.markernum);
   }).attr('cursor', 'pointer').attr('width', markerWidth).attr('height', markerHeight).attr('transform', function (d, i) {
     return 'translate(0, ' + markerHeight * i + ')';
   }).on('click', function (d) {
     return $('#timeline').trigger('ufoClick', d);
   }).append('title').text(function (d) {
-    return '' + d.indexname;
+    return d.indexname;
   });
-  plotItems.transition().duration(1000).attr('transform', function (d) {
+
+  plotYears.transition().duration(1000).attr('transform', function (d) {
     return 'translate(' + xScale(d[0]) + ', 0)';
   });
 
-  plotItems.exit().selectAll('rect.marker').attr('width', function (d) {
-    return console.log('..', d);
-  }).attr('transform', function (d, i) {
+  plotMarkers.exit().transition().duration(1000)
+  // .attr('width', (d) => console.log('..', d))
+  .attr('transform', function (d, i) {
     return 'translate(0, ' + height + ')';
   }).remove();
-  plotItems.exit().attr('width', function (d) {
-    return console.log('bye', d);
-  }).remove().selectAll('rect.marker').transition().duration(1000).attr('width', 0).attr('transform', function (d, i) {
-    return 'translate(0, ' + height + ')';
-  }).remove();
+
+  plotYears.exit().transition().duration(1000).remove();
 }
 
 function init(data) {
