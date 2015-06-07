@@ -64904,7 +64904,7 @@ map.on('moveend', function (result) {
 });
 
 // initial load
-debouncedSearch();
+doSearch();
 
 $('#timeline').on('ufoClick', function (e, a) {
   var marker = markerLookup[a.markernum];
@@ -65060,8 +65060,7 @@ function plot(data) {
     return d3.rgb(colorScale(d.markernum)).darker(1);
   }).attr('fill', function (d) {
     return colorScale(d.markernum);
-  }).attr('cursor', 'pointer').attr('width', markerWidth) // FIXME
-  .attr('height', markerHeight).attr('transform', function (d, i) {
+  }).attr('cursor', 'pointer').attr('width', 0).attr('height', markerHeight).attr('transform', function (d, i) {
     return 'translate(0, ' + markerHeight * i + ')';
   }).on('click', function (d) {
     return $('#timeline').trigger('ufoClick', d);

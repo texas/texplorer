@@ -69,7 +69,7 @@ map.on('moveend', function(result) {
 });
 
 // initial load
-debouncedSearch();
+doSearch();
 
 $('#timeline').on('ufoClick', function (e, a) {
   var marker = markerLookup[a.markernum];

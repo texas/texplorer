@@ -88,7 +88,7 @@ function plot(data) {
     .attr('stroke', (d) => d3.rgb(colorScale(d.markernum)).darker(1))
     .attr('fill', (d) => colorScale(d.markernum))
     .attr('cursor', 'pointer')
-    .attr('width', markerWidth)  // FIXME
+    .attr('width', 0)
     .attr('height', markerHeight)
     .attr('transform', (d, i) => `translate(0, ${markerHeight * i})`)
     .on('click', (d) => $('#timeline').trigger('ufoClick', d))
