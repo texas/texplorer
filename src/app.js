@@ -17,8 +17,10 @@ var markersLayer = new L.LayerGroup();
 map.addLayer(markersLayer);
 
 var buildMarker = function(data, group) {
+  var html = `<h2>${data.title}</h2><p>${data.markertext}</p>`;
+
   return L.marker([data.location.lat, data.location.lon])
-    .bindPopup(data.title)
+    .bindPopup(html, {autoPan: false})
     .addTo(markersLayer);
 }
 
