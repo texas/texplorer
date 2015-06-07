@@ -16,7 +16,8 @@ DOC_TYPE = 'marker'
 def find_years(text):
     try:
         matches = re.findall(r"\d{4}", text)
-        return [int(m) for m in matches]
+        years = [int(m) for m in matches]
+        return list(set(years))
     except TypeError:
         return []
 
