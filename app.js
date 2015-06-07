@@ -65100,6 +65100,9 @@ function init(data) {
   _.each(data, function (marker) {
     // console.log(marker._source.indexname, marker._source.years, marker._source);
     _.each(marker._source.years, function (year) {
+      if (year > 2015) {
+        return;
+      }
       if (!yearBuckets[year]) {
         yearBuckets[year] = [];
       }

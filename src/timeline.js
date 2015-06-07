@@ -130,6 +130,9 @@ function init(data) {
   _.each(data, (marker) => {
     // console.log(marker._source.indexname, marker._source.years, marker._source);
     _.each(marker._source.years, (year) => {
+      if (year > 2015) {
+        return;
+      }
       if (!yearBuckets[year]) {
         yearBuckets[year] = [];
       }
