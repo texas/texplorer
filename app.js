@@ -64955,8 +64955,9 @@ var d3 = require('d3');
 var colors = require('./colors');
 window.d3 = d3; // DEBUG
 
-var width, height, svg, svgPlot;
+var width, height, svg, svgEpochs, svgPlot;
 var colorScale;
+var epochs = [{ name: 'Pre-History', start: 1000, end: 1619, fill: 'burlywood' }, { name: 'French Colonization', start: 1680, end: 1690, fill: 'darkblue' }, { name: 'Spanish Texas', start: 1691, end: 1821, fill: 'chocolate' }, { name: 'Texas Independence', start: 1835, end: 1845, fill: 'crimson' }, { name: 'Civil War', start: 1860, end: 1865, fill: 'gray' }, { name: 'Galveston Hurricane', start: 1906, end: 1906, fill: 'powderblue' }, { name: 'Civil Rights', start: 1940, end: 1950, fill: 'cadetblue' }];
 
 function plot(data) {
   width = $('#timeline').width();
@@ -64968,6 +64969,7 @@ function plot(data) {
     return d[0];
   });
   var xScale = d3.scale.linear().domain(yearRange).range([0, width]);
+  var yearZero = +yearRange[0];
 
   var xAxis = d3.svg.axis().orient('bottom').scale(xScale).tickFormat(function (x) {
     return x;
@@ -64976,12 +64978,32 @@ function plot(data) {
   var timeline = d3.select('#timeline');
 
   if (!svgPlot) {
+    // create
     svg = d3.select('#timeline').append('svg').attr('width', '100%').attr('height', '100%').attr('viewbox', '0 0 ${width} 100').attr('preserveAspectRatio', 'xMinYMin meet');
 
+    // epochs
+    svgEpochs = svg.append('g').attr('class', 'epoch');
+    svgEpochs.selectAll('rect.epoch').data(epochs).enter().append('rect').attr('class', 'epoch').attr('width', function (d) {
+      return xScale(d.end - d.start + yearZero);
+    }).attr('height', height - 20).attr('fill', function (d) {
+      return d.fill;
+    }).attr('opacity', 0.75).attr('transform', function (d) {
+      return 'translate(' + xScale(d.start) + ', 0)';
+    }).append('title').text(function (d) {
+      return d.name;
+    });
+    // plot
     svgPlot = svg.append('g').attr('class', 'plot');
+    // x axis
     svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0, ' + (height - 20) + ')').call(xAxis);
   } else {
+    // updates
     svg.select('.x.axis').transition().duration(1000).call(xAxis);
+    svgEpochs.selectAll('rect.epoch').data(epochs).transition().duration(1000).attr('width', function (d) {
+      return xScale(d.end - d.start + yearZero);
+    }).attr('transform', function (d) {
+      return 'translate(' + xScale(d.start) + ', 0)';
+    });
   }
 
   var plotItems = svgPlot.selectAll('g.year').data(data);
