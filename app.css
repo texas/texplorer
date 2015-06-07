@@ -1,3 +1,7 @@
+#map {
+  height: 70vh;
+}
+
 .timeline {
   position: relative;
   height: 100px;
