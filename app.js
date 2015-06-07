@@ -64968,7 +64968,7 @@ function plot(data) {
   var yearRange = d3.extent(data, function (d) {
     return d[0];
   });
-  var xScale = d3.scale.linear().domain(yearRange).range([0, width]);
+  var xScale = d3.scale.linear().domain(yearRange).range([0, width - markerWidth]);
   var yearZero = +yearRange[0];
 
   var xAxis = d3.svg.axis().orient('bottom').scale(xScale).tickFormat(function (x) {
@@ -64995,7 +64995,7 @@ function plot(data) {
     // plot
     svgPlot = svg.append('g').attr('class', 'plot');
     // x axis
-    svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0, ' + (height - 20) + ')').call(xAxis);
+    svg.append('g').attr('class', 'x axis').attr('transform', 'translate(' + markerWidth / 2 + ', ' + (height - 20) + ')').call(xAxis);
   } else {
     // updates
     svg.select('.x.axis').transition().duration(1000).call(xAxis);
@@ -65004,11 +65004,15 @@ function plot(data) {
     }).attr('transform', function (d) {
       return 'translate(' + xScale(d.start) + ', 0)';
     });
+    // HACK because I can't get .exit().remove() to work right
+    svgPlot.selectAll('g.year').remove();
   }
 
   var plotItems = svgPlot.selectAll('g.year').data(data);
   plotItems.enter().append('g').attr('class', 'year').attr('transform', function (d) {
-    return 'translate(' + xScale(d[0]) + ', 0)';
+    return 'translate(' + (xScale(d[0]) - markerWidth) + ', 0)';
+  }).attr('year', function (d) {
+    return d[0];
   }).selectAll('rect.marker').data(function (d) {
     return d[1];
   }).enter().append('rect').attr('class', 'market').attr('fill', function (d) {
@@ -65017,9 +65021,23 @@ function plot(data) {
     return 'translate(0, ' + markerHeight * i + ')';
   }).on('click', function (d) {
     return $('#timeline').trigger('ufoClick', d);
+  }).append('title').text(function (d) {
+    return '' + d.indexname;
+  });
+  plotItems.transition().duration(1000).attr('transform', function (d) {
+    return 'translate(' + xScale(d[0]) + ', 0)';
   });
 
-  plotItems.exit().remove();
+  plotItems.exit().selectAll('rect.marker').attr('width', function (d) {
+    return console.log('..', d);
+  }).attr('transform', function (d, i) {
+    return 'translate(0, ' + height + ')';
+  }).remove();
+  plotItems.exit().attr('width', function (d) {
+    return console.log('bye', d);
+  }).remove().selectAll('rect.marker').transition().duration(1000).attr('width', 0).attr('transform', function (d, i) {
+    return 'translate(0, ' + height + ')';
+  }).remove();
 }
 
 function init(data) {

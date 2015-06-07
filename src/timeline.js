@@ -25,7 +25,7 @@ function plot(data) {
   var markerWidth= 7;
 
   var yearRange = d3.extent(data, (d) => d[0]);
-  var xScale = d3.scale.linear().domain(yearRange).range([0, width]);
+  var xScale = d3.scale.linear().domain(yearRange).range([0, width - markerWidth]);
   var yearZero = +yearRange[0];
 
   var xAxis = d3.svg.axis().orient('bottom')
@@ -60,7 +60,7 @@ function plot(data) {
     // x axis
     svg.append('g')
       .attr('class', 'x axis')
-      .attr('transform', `translate(0, ${height - 20})`)
+      .attr('transform', `translate(${markerWidth / 2}, ${height - 20})`)
       .call(xAxis);
   } else {
     // updates
@@ -70,6 +70,8 @@ function plot(data) {
       .transition().duration(1000)
       .attr('width', (d) => xScale(d.end - d.start + yearZero))
       .attr('transform', (d) => `translate(${xScale(d.start)}, 0)`);
+    // HACK because I can't get .exit().remove() to work right
+    svgPlot.selectAll('g.year').remove();
   }
 
   var plotItems = svgPlot.selectAll('g.year').data(data);
@@ -77,7 +79,8 @@ function plot(data) {
     .enter()
       .append('g')
       .attr('class', 'year')
-      .attr('transform', (d) => `translate(${xScale(d[0])}, 0)`)
+      .attr('transform', (d) => `translate(${xScale(d[0]) - markerWidth}, 0)`)
+      .attr('year', (d) => d[0])
       .selectAll('rect.marker')
         .data((d) => d[1])
         .enter()
@@ -89,9 +92,27 @@ function plot(data) {
           .attr('height', markerHeight)
           .attr('transform', (d, i) => `translate(0, ${markerHeight * i})`)
           .on('click', (d) => $('#timeline').trigger('ufoClick', d))
+          .append('title')
+            .text((d) => `${d.indexname}`)
+  plotItems
+    .transition().duration(1000)
+    .attr('transform', (d) => `translate(${xScale(d[0])}, 0)`)
 
   plotItems
-    .exit().remove();
+    .exit()
+      .selectAll('rect.marker')
+        .attr('width', (d) => console.log('..', d))
+        .attr('transform', (d, i) => `translate(0, ${height})`)
+        .remove();
+  plotItems
+    .exit()
+      .attr('width', (d) => console.log('bye', d))
+      .remove()
+      .selectAll('rect.marker')
+        .transition().duration(1000)
+        .attr('width', 0)
+        .attr('transform', (d, i) => `translate(0, ${height})`)
+        .remove();
 }
 
 function init(data) {
