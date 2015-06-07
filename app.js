@@ -64835,7 +64835,7 @@ function hasOwnProperty(obj, prop) {
 
 var _ = require('lodash');
 var timeline = require('./timeline');
-var search = require('./search'); // TODO debounce this
+var search = require('./search');
 var colors = require('./colors');
 var d3 = require('d3');
 
@@ -64880,6 +64880,7 @@ function _gotResults(data) {
   var visibleMarkers = _.filter(data.hits.hits, function (x) {
     return bounds.contains([x._source.location.lat, x._source.location.lon]);
   });
+  visibleMarkers = data.hits.hits;
   if (!visibleMarkers.length) {
     // bail
     // TODO handle when there's nothing to show
@@ -64892,16 +64893,23 @@ function _gotResults(data) {
   timeline.init(visibleMarkers);
 }
 
+function doSearch() {
+  var bounds = map.getBounds();
+  search(bounds.getNorthWest(), bounds.getSouthEast()).then(_gotResults);
+}
+
+var debouncedSearch = _.debounce(doSearch, 200);
+
 map.on('locationfound', function (loc) {
-  search([loc.latitude, loc.longitude]).then(_gotResults);
+  debouncedSearch();
 });
 
 map.on('moveend', function (result) {
-  search([map.getCenter().lat, map.getCenter().lng]).then(_gotResults);
+  debouncedSearch();
 });
 
 // initial load
-search([map.getCenter().lat, map.getCenter().lng]).then(_gotResults);
+doSearch();
 
 $('#timeline').on('ufoClick', function (e, a) {
   var marker = markerLookup[a.markernum];
@@ -64928,6 +64936,7 @@ module.exports = function (data) {
 var ES_URL = 'localhost:9200';
 var ES_URL = '45.55.233.185:9200';
 
+var _ = require('lodash');
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
   host: ES_URL
@@ -64936,6 +64945,34 @@ var client = new elasticsearch.Client({
 function search(latLng, distance) {
   latLng = latLng || [30, -97]; // DEBUG
   distance = distance || '16km'; // DEBUG
+  console.log(latLng, distance);
+  var filter;
+  if (_.isObject(distance)) {
+    filter = {
+      geo_bounding_box: {
+        'marker.location': {
+          top_left: {
+            lat: latLng.lat,
+            lon: latLng.lng
+          },
+          bottom_right: {
+            lat: distance.lat,
+            lon: distance.lng
+          }
+        }
+      }
+    };
+  } else {
+    filter = {
+      geo_distance: {
+        distance: distance,
+        'marker.location': {
+          lat: latLng.lat,
+          lon: latLng.lng
+        }
+      }
+    };
+  }
   return client.search({
     // index: 'thc',
     // type: 'markers',
@@ -64943,15 +64980,7 @@ function search(latLng, distance) {
       query: {
         filtered: {
           query: { match_all: {} },
-          filter: {
-            geo_distance: {
-              distance: distance,
-              'marker.location': {
-                lat: latLng[0],
-                lon: latLng[1]
-              }
-            }
-          }
+          filter: filter
         }
       }
     }
@@ -64961,7 +64990,7 @@ function search(latLng, distance) {
 module.exports = search;
 //log: 'trace'
 
-},{"elasticsearch":4}],52:[function(require,module,exports){
+},{"elasticsearch":4,"lodash":48}],52:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash');
@@ -65075,6 +65104,9 @@ function init(data) {
   _.each(data, function (marker) {
     // console.log(marker._source.indexname, marker._source.years, marker._source);
     _.each(marker._source.years, function (year) {
+      if (year > 2015) {
+        return;
+      }
       if (!yearBuckets[year]) {
         yearBuckets[year] = [];
       }

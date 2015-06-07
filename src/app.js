@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var timeline = require('./timeline');
-var search = require('./search');  // TODO debounce this
+var search = require('./search');
 var colors = require('./colors');
 var d3 = require('d3');
 
@@ -46,6 +46,7 @@ function _gotResults(data) {
   var bounds = map.getBounds();
   var visibleMarkers = _.filter(data.hits.hits,
         (x) => bounds.contains([x._source.location.lat, x._source.location.lon]))
+  visibleMarkers = data.hits.hits
   if (!visibleMarkers.length) {
     // bail
     // TODO handle when there's nothing to show
@@ -56,19 +57,24 @@ function _gotResults(data) {
   timeline.init(visibleMarkers);
 }
 
-map.on('locationfound', function(loc) {
-  search([loc.latitude, loc.longitude])
+function doSearch() {
+  var bounds = map.getBounds();
+  search(bounds.getNorthWest(), bounds.getSouthEast())
     .then(_gotResults);
+}
+
+var debouncedSearch = _.debounce(doSearch, 200)
+
+map.on('locationfound', function(loc) {
+  debouncedSearch();
 });
 
 map.on('moveend', function(result) {
-  search([map.getCenter().lat, map.getCenter().lng])
-    .then(_gotResults);
+  debouncedSearch();
 });
 
 // initial load
-search([map.getCenter().lat, map.getCenter().lng])
-  .then(_gotResults);
+doSearch();
 
 $('#timeline').on('ufoClick', function (e, a) {
   var marker = markerLookup[a.markernum];
