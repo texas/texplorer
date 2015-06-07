@@ -4,7 +4,7 @@ var search = require('./search');
 var center = [30.2225, -97.7426];
 var map = L.map('map', {
     center: center,
-    zoom: 13,
+    zoom: 12,
     zoomControl: false
   });
   window.map = map;  // DEBUG
@@ -32,6 +32,7 @@ function _gotResults(data) {
   var currentMarkers = _.map(data.hits.hits, function(element) {
     return buildMarker(element._source, markersLayer);
   });
+  timeline.init(data);
 }
 
 map.on('locationfound', function(loc) {
