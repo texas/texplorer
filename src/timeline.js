@@ -74,6 +74,8 @@ function plot(data) {
 
   var plotYears = svgPlot.selectAll('g.year').data(data);
   var plotMarkers = plotYears.selectAll('rect.marker').data((d) => d[1])
+
+  // enter
   plotYears
     .enter()
       .append('g')
@@ -97,10 +99,18 @@ function plot(data) {
     .transition().duration(1000)
       .attr('width', markerWidth)
 
+  // update
   plotYears
     .transition().duration(1000)
     .attr('transform', (d) => `translate(${xScale(d[0])}, 0)`)
+  plotMarkers
+    .attr('stroke', (d) => d3.rgb(colorScale(d.markernum)).darker(1))
+    .attr('fill', (d) => colorScale(d.markernum))
+    .on('click', (d) => $('#timeline').trigger('ufoClick', d))
+  plotMarkers
+    .select('title').text((d) => d.indexname);
 
+  // exit
   plotMarkers
     .exit()
     .transition().duration(1000)

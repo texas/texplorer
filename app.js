@@ -65014,6 +65014,8 @@ function plot(data) {
   var plotMarkers = plotYears.selectAll('rect.marker').data(function (d) {
     return d[1];
   });
+
+  // enter
   plotYears.enter().append('g').attr('class', 'year').attr('transform', function (d) {
     return 'translate(' + xScale(d[0]) + ', 0)';
   }).attr('year', function (d) {
@@ -65034,10 +65036,22 @@ function plot(data) {
   });
   incomingMarkers.transition().duration(1000).attr('width', markerWidth);
 
+  // update
   plotYears.transition().duration(1000).attr('transform', function (d) {
     return 'translate(' + xScale(d[0]) + ', 0)';
   });
+  plotMarkers.attr('stroke', function (d) {
+    return d3.rgb(colorScale(d.markernum)).darker(1);
+  }).attr('fill', function (d) {
+    return colorScale(d.markernum);
+  }).on('click', function (d) {
+    return $('#timeline').trigger('ufoClick', d);
+  });
+  plotMarkers.select('title').text(function (d) {
+    return d.indexname;
+  });
 
+  // exit
   plotMarkers.exit().transition().duration(1000).attr('transform', function (d, i) {
     return 'translate(0, ' + height + ')';
   }).remove();
