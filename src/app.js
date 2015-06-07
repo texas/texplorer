@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var timeline = require('./timeline');
-var search = require('./search');
+var search = require('./search');  // TODO debounce this
 var colors = require('./colors');
 var d3 = require('d3');
 
