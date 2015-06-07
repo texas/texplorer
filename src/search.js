@@ -1,4 +1,4 @@
-var ES_URL = 'localhost:9200';
+var ES_URL = 'http://45.55.233.185:9200';
 
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
