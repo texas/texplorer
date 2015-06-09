@@ -1,11 +1,8 @@
 var _ = require('lodash');
 var d3 = require('d3');
 var colors = require('./colors');
-window.d3 = d3;  // DEBUG
-
 
 var width, height, svg, svgEpochs, svgPlot;
-var colorScale;
 var epochs = [
   {name: 'Pre-History', start: 1000, end: 1619, fill: 'burlywood'},
   {name: 'French Colonization', start: 1680, end: 1690, fill: 'darkblue'},
@@ -85,8 +82,8 @@ function plot(data) {
 
   var incomingMarkers = plotMarkers.enter().append('rect')
     .attr('class', 'marker')
-    .attr('stroke', (d) => d3.rgb(colorScale(d.markernum)).darker(1))
-    .attr('fill', (d) => colorScale(d.markernum))
+    .attr('stroke', (d) => d3.rgb(colors(d)).darker(1))
+    .attr('fill', (d) => colors(d))
     .attr('cursor', 'pointer')
     .attr('width', 0)
     .attr('height', markerHeight)
@@ -104,8 +101,8 @@ function plot(data) {
     .transition().duration(1000)
     .attr('transform', (d) => `translate(${xScale(d[0])}, 0)`)
   plotMarkers
-    .attr('stroke', (d) => d3.rgb(colorScale(d.markernum)).darker(1))
-    .attr('fill', (d) => colorScale(d.markernum))
+    .attr('stroke', (d) => d3.rgb(colors(d)).darker(1))
+    .attr('fill', (d) => colors(d))
     .on('click', (d) => $('#timeline').trigger('ufoClick', d))
   plotMarkers
     .select('title').text((d) => d.indexname);
@@ -126,7 +123,6 @@ function plot(data) {
 
 function init(data) {
   var yearBuckets = {};
-  colorScale = colors(data);
   _.each(data, (marker) => {
     // console.log(marker._source.indexname, marker._source.years, marker._source);
     _.each(marker._source.years, (year) => {

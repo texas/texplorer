@@ -3,6 +3,9 @@ var timeline = require('./timeline');
 var search = require('./search');
 var colors = require('./colors');
 var d3 = require('d3');
+if (process.env.NODE_ENV === 'development') {
+  window.d3 = d3;
+}
 
 var colorScale;
 var center = [30.2225, -97.7426];
@@ -31,8 +34,8 @@ var buildMarker = function(data, group) {
   var html = `<h2>${data.title}</h2><p>${data.markertext}</p>`;
 
   var marker =  L.circleMarker([data.location.lat, data.location.lon], {
-    color: d3.rgb(colorScale(data.markernum)).darker(1),
-    fillColor: colorScale(data.markernum),
+    color: d3.rgb(colors(data)).darker(1),
+    fillColor: colors(data),
     fillOpacity: 0.8,
     radius: 7
   })
@@ -55,7 +58,6 @@ function _gotResults(data) {
     // TODO handle when there's nothing to show
     return;
   }
-  colorScale = colors(visibleMarkers);
   _.map(visibleMarkers, (element) => buildMarker(element._source, markersLayer));
   timeline.init(visibleMarkers);
 }
