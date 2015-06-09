@@ -64875,6 +64875,9 @@ var buildMarker = function buildMarker(data, group) {
 };
 
 function _gotResults(data) {
+  if ("development" === 'development') {
+    console.log('got ' + data.hits.hits.length + ' out of ' + data.hits.total);
+  }
   markersLayer.clearLayers();
   var bounds = map.getBounds();
   var visibleMarkers = _.filter(data.hits.hits, function (x) {
@@ -64943,9 +64946,6 @@ var client = new elasticsearch.Client({
 });
 
 function search(latLng, distance) {
-  latLng = latLng || [30, -97]; // DEBUG
-  distance = distance || '16km'; // DEBUG
-  console.log(latLng, distance);
   var filter;
   if (_.isObject(distance)) {
     filter = {
@@ -64974,7 +64974,7 @@ function search(latLng, distance) {
     };
   }
   return client.search({
-    // index: 'thc',
+    index: 'thc',
     // type: 'markers',
     body: {
       query: {
@@ -64982,7 +64982,8 @@ function search(latLng, distance) {
           query: { match_all: {} },
           filter: filter
         }
-      }
+      },
+      size: 100
     }
   });
 }

@@ -42,6 +42,9 @@ var buildMarker = function(data, group) {
 }
 
 function _gotResults(data) {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`got ${data.hits.hits.length} out of ${data.hits.total}`);
+  }
   markersLayer.clearLayers();
   var bounds = map.getBounds();
   var visibleMarkers = _.filter(data.hits.hits,

@@ -10,9 +10,6 @@ var client = new elasticsearch.Client({
 
 
 function search(latLng, distance) {
-  latLng = latLng || [30, -97];  // DEBUG
-  distance = distance || '16km';  // DEBUG
-  console.log(latLng, distance)
   var filter;
   if (_.isObject(distance)) {
     filter = {
@@ -41,15 +38,16 @@ function search(latLng, distance) {
     };
   }
   return client.search({
-    // index: 'thc',
+    index: 'thc',
     // type: 'markers',
     body: {
       query:{
         filtered: {
           query: {match_all: {}},
           filter: filter
-        }
-      }
+        },
+      },
+      size: 100
     }
   })
 }
