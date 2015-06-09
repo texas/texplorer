@@ -10,9 +10,7 @@ function _gotResults(data) {
   }
   mainMap.markersLayer.clearLayers();
   var bounds = mainMap.map.getBounds();
-  var visibleMarkers = _.filter(data.hits.hits,
-        (x) => bounds.contains([x._source.location.lat, x._source.location.lon]))
-  visibleMarkers = data.hits.hits
+  var visibleMarkers = data.hits.hits;
   if (!visibleMarkers.length) {
     // bail
     // TODO handle when there's nothing to show
@@ -31,16 +29,12 @@ function doSearch() {
 var debouncedSearch = _.debounce(doSearch, 200)
 
 mainMap.init();
-mainMap.map.on('locationfound', function(loc) {
-  debouncedSearch();
-});
-mainMap.map.on('moveend', function(result) {
-  debouncedSearch();
-});
+mainMap.map.on('locationfound', debouncedSearch);
+mainMap.map.on('moveend', debouncedSearch);
 // initial load
 doSearch();
 
-$('#timeline').on('ufoClick', function (e, a) {
-  var marker = mainMap.markerLookup[a.markernum];
+$('#timeline').on('ufoClick', function (e, extraData) {
+  var marker = mainMap.markerLookup[extraData.markernum];
   marker && marker.openPopup();
 });
