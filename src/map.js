@@ -1,10 +1,15 @@
+import L from 'leaflet';
+import 'leaflet-hash';
+// need to manually specify this
+L.Icon.Default.imagePath = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/images';
+
 var d3 = require('d3');
 if (process.env.NODE_ENV === 'development') {
   window.d3 = d3;
 }
 var colors = require('./colors');
 
-var center = [30.2225, -97.7426];
+var center = [20.2225, -97.7426];
 var southWest = L.latLng(26.603, -106.567);
 var northEast = L.latLng(36.927, -93.515);
 var bounds = L.latLngBounds(southWest, northEast);
@@ -56,5 +61,8 @@ export function init() {
   markersLayer = new L.LayerGroup();
   map.addLayer(markersLayer);
   map.addControl(new TopControl());
-  map.locate({setView: true, maxZoom: 13});
+  if (!document.location.hash) {
+    map.locate({setView: true, maxZoom: 13});
+  }
+  new L.hash(map);
 }
