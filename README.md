@@ -10,8 +10,9 @@ to set an environment variable like `export ELASTICSEARCH_HOST=$(boot2docker
 ip)`.
 
 #### Loading data
-Assuming you have the right file in `data/...`, you can load it using `make
-index`.
+
+Run `make data` to get the data onto your computer, then `make index` to load
+that data into Elasticsearch.
 
 #### Frontend
 Start a webserver on port 8000:
