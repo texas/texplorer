@@ -1,5 +1,7 @@
-var DEFAULT_ES_URL = 'https://ik44vn6o9c:q2jynmlzrj@texplorer-4276945103.us-west-2.bonsai.io';
-var ES_URL = process.env.ELASTICSEARCH_URL || DEFAULT_ES_URL
+var ES_URL = 'localhost:9200';
+if (process.env.ELASTICSEARCH_URL) {
+  ES_URL = process.env.ELASTICSEARCH_URL;
+}
 
 var _ = require('lodash');
 var elasticsearch = require('elasticsearch');
