@@ -2,6 +2,9 @@ var _ = require('lodash');
 var d3 = require('d3');
 var colors = require('./colors');
 
+var YEAR_MIN = 1601;
+var YEAR_MAX = 2015;
+
 var width, height, svg, svgEpochs, svgPlot;
 var epochs = [
   {name: 'Pre-History', start: 1000, end: 1619, fill: 'burlywood'},
@@ -127,7 +130,7 @@ function init(data) {
   _.each(data, (marker) => {
     // console.log(marker._source.indexname, marker._source.years, marker._source);
     _.each(marker._source.years, (year) => {
-      if (year > 2015) {
+      if (YEAR_MIN > year || year > YEAR_MAX) {
         return;
       }
       if (!yearBuckets[year]) {
