@@ -3,7 +3,7 @@ module.exports = (grunt) ->
     pkg: grunt.file.readJSON('package.json')
     browserify:
       options:
-        transform: ['babelify']
+        transform: ['babelify', 'envify']
       app:
         files:
           'app.js': 'src/app.js'

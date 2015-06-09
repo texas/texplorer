@@ -64933,9 +64933,8 @@ module.exports = function (data) {
 },{"d3":1,"lodash":48}],51:[function(require,module,exports){
 'use strict';
 
-var ES_URL = 'localhost:9200';
-ES_URL = '45.55.233.185:9200';
-ES_URL = 'https://ik44vn6o9c:q2jynmlzrj@texplorer-4276945103.us-west-2.bonsai.io';
+var DEFAULT_ES_URL = 'https://ik44vn6o9c:q2jynmlzrj@texplorer-4276945103.us-west-2.bonsai.io';
+var ES_URL = "localhost:9200" || DEFAULT_ES_URL;
 
 var _ = require('lodash');
 var elasticsearch = require('elasticsearch');
