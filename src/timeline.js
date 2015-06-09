@@ -142,6 +142,8 @@ function init(data) {
 
   var timelineData = _.pairs(yearBuckets);
   plot(timelineData);
+  // FIXME HACK to fix markers not getting shown the first time
+  plot(timelineData);
 }
 
 module.exports.init = init;
