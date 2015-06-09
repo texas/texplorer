@@ -24,7 +24,7 @@ var TopControl = L.Control.extend({
 })
 
 export var buildMarker = function(data, group) {
-  var html = `<h2>${data.title}</h2><p>${data.markertext}</p>`;
+  var html = `<h4>${data.title}</h4><p>${data.markertext}</p>`;
 
   var marker = L.circleMarker([data.location.lat, data.location.lon], {
     color: d3.rgb(colors(data)).darker(1),
@@ -45,16 +45,16 @@ export function init() {
       maxBounds: bounds,
       zoomControl: false
     });
-    window.map = map;  // DEBUG
-
-    L.tileLayer('http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.jpg', {
-     maxZoom: 18,
-     attribution: 'map',
+  if (process.env.NODE_ENV === 'development') {
+    window.map = map;
+  }
+  L.tileLayer('http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.jpg', {
+    maxZoom: 18,
+    attribution: 'map',
   }).addTo(map);
 
   markersLayer = new L.LayerGroup();
   map.addLayer(markersLayer);
   map.addControl(new TopControl());
   map.locate({setView: true, maxZoom: 13});
-
 }

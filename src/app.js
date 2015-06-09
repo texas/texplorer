@@ -33,7 +33,7 @@ function doSearch() {
     .then(_gotResults);
 }
 
-var debouncedSearch = _.debounce(doSearch, 200)
+var debouncedSearch = _.debounce(doSearch, 300)
 
 mainMap.init();
 mainMap.map.on('locationfound', debouncedSearch);
