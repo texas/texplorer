@@ -8,13 +8,20 @@ function _gotResults(data) {
   if (process.env.NODE_ENV === 'development') {
     console.log(`got ${data.hits.hits.length} out of ${data.hits.total}`);
   }
+  mainMap.$top.text('');
   mainMap.markersLayer.clearLayers();
   var bounds = mainMap.map.getBounds();
   var visibleMarkers = data.hits.hits;
   if (!visibleMarkers.length) {
     // bail
-    // TODO handle when there's nothing to show
+    mainMap.$top.text('No markers at this zoom, try zooming out');
     return;
+  } else if (data.hits.hits.length < data.hits.total) {
+    mainMap.$top.html(`Displaying <strong>${data.hits.hits.length}</strong> out of
+                       <strong>${data.hits.total}</strong> markers,
+                       zoom in to see more.`);
+  } else {
+    mainMap.$top.html(`Displaying <strong>${data.hits.hits.length}</strong> markers.`);
   }
   _.map(visibleMarkers, (element) => mainMap.buildMarker(element._source, mainMap.markersLayer));
   timeline.init(visibleMarkers);

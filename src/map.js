@@ -12,6 +12,16 @@ var bounds = L.latLngBounds(southWest, northEast);
 export var map;
 export var markersLayer;
 export var markerLookup = {};
+export var $top = $('<div class="leaflet-control leaflet-bar topbar">loading...</div>');
+
+var TopControl = L.Control.extend({
+  options: {
+    position: 'topright'
+  },
+  onAdd: (map) => {
+    return $top[0];
+  }
+})
 
 export var buildMarker = function(data, group) {
   var html = `<h2>${data.title}</h2><p>${data.markertext}</p>`;
@@ -44,7 +54,7 @@ export function init() {
 
   markersLayer = new L.LayerGroup();
   map.addLayer(markersLayer);
-
+  map.addControl(new TopControl());
   map.locate({setView: true, maxZoom: 13});
 
 }
