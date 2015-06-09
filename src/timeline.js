@@ -14,12 +14,13 @@ var epochs = [
 ];
 
 
+var defaultMarkerHeight = 20;
+var markerWidth= 7;
 
 function plot(data) {
   width = $('#timeline').width();
   height = $('#timeline').height();
-  var markerHeight = 20;
-  var markerWidth= 7;
+  var markerHeight = Math.min(defaultMarkerHeight, (height - 20) / d3.max(data, (d) => d[1].length));
 
   var yearRange = d3.extent(data, (d) => d[0]);
   var xScale = d3.scale.linear().domain(yearRange).range([0, width - markerWidth]);
