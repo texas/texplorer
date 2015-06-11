@@ -3,8 +3,8 @@ import os
 import re
 
 import utm
-from elasticsearch import Elasticsearch
-from elasticsearch import NotFoundError
+from elasticsearch import Elasticsearch, NotFoundError
+from elasticsearch.helpers import bulk
 from lib.classificator import Classifier
 
 
@@ -69,25 +69,45 @@ def set_mapping():
     })
 
 
+def to_doc(row):
+    """Format a row as a document for the bulk api."""
+    return {
+        '_index': INDEX,
+        '_type': DOC_TYPE,
+        '_id': row['atlas_number'],
+        'doc': row,
+    }
+
+
+def get_bulk_ready_data():
+    """Return an iterator to use with the bulk helper."""
+    for row in get_data():
+        yield to_doc(row)
+
+
 def push():
     host = os.environ.get('ELASTICSEARCH_HOST', 'localhost')
     connection = Elasticsearch([host])
 
-    # delete old markers or do initial setup
+    # Delete old markers or do initial setup
     try:
         print(connection.delete_by_query(index=[INDEX], doc_type=DOC_TYPE, q='*'))
     except NotFoundError:
         set_mapping()
 
-    # TODO use `bulk` to make this faster
-    for row in get_data():
-        connection.create(
-            index=INDEX,
-            doc_type=DOC_TYPE,
-            body=row,
-            id=row['atlas_number'],
-        )
+    if True:
+        # real  0m9.839s
+        bulk(connection, get_bulk_ready_data())
+    else:
+        # real  0m30.341s
+        for row in get_data():
+            connection.create(
+                index=INDEX,
+                doc_type=DOC_TYPE,
+                body=row,
+                id=row['atlas_number'],
+            )
+
 
 if __name__ == '__main__':
     push()
-    # set_mapping()
