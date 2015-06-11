@@ -5,7 +5,6 @@ import re
 import utm
 from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError
-from elasticsearch.client import IndicesClient
 from lib.classificator import Classifier
 
 
@@ -56,12 +55,8 @@ def set_mapping():
     """
     host = os.environ.get('ELASTICSEARCH_HOST', 'localhost')
     connection = Elasticsearch([host])
-    iclient = IndicesClient(connection)
-    try:
-        iclient.delete(index=[INDEX])
-    except NotFoundError:
-        pass
-    iclient.create(index=INDEX, body={
+    connection.indices.delete(index=[INDEX], ignore=[404])
+    connection.indices.create(index=INDEX, body={
         'mappings': {
             DOC_TYPE: {
                 'properties': {
